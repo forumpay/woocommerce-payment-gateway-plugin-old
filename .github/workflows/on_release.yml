@@ -1,0 +1,51 @@
+name: Create release
+
+on:
+  release:
+    types: [published]
+
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout source code
+      uses: actions/checkout@v1
+
+
+    - name: Get tag name and assets upload URL
+      id: get_tag
+      run: |
+        sudo apt-get install -y -q jq
+        export TAG=${GITHUB_REF#refs/tags/}
+        export VERSION=${GITHUB_REF#refs/tags/v}
+        export ASSETS_UPLOAD_URL=`curl "https://api.github.com/repos/${{ github.repository }}/releases/tags/$TAG" | jq -r ".upload_url"`
+        echo "::set-output name=tag::$TAG"
+        echo "::set-output name=version::$VERSION"
+        echo "::set-output name=upload_url::$ASSETS_UPLOAD_URL"
+
+
+    - name: Create bundle
+      if: success() && startsWith(github.ref, 'refs/tags/v')
+      run: |
+        sudo apt-get install -y -q zip
+        mkdir -p /tmp/zip/woocommerce-forumpay
+        cp -r * /tmp/zip/woocommerce-forumpay/
+        rm -rf /tmp/zip/woocommerce-forumpay/.git
+        rm -rf /tmp/zip/woocommerce-forumpay/.github
+        cd /tmp/zip
+        zip -r "/tmp/woocommerce-payment-gateway-plugin-${{ steps.get_tag.outputs.version }}.zip" *
+
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      # https://docs.github.com/en/actions/reference/authentication-in-a-workflow#about-the-github_token-secret
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_tag.outputs.upload_url }}
+        asset_path: "/tmp/woocommerce-payment-gateway-plugin-${{ steps.get_tag.outputs.version }}.zip"
+        asset_name: "woocommerce-payment-gateway-plugin-${{ steps.get_tag.outputs.version }}.zip"
+        asset_content_type: application/zip
