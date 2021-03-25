@@ -3,9 +3,11 @@
  * Plugin Name: WooCommerce Forumpay Payment Gateway Plugin
  * Plugin URI: https://forumpay.com
  * Description: Extends WooCommerce with Forumpay gateway.
- * Version: 1.1
+ * Version: 1.1.0
  * Author: Limitlex
  **/
+
+define('FORUMPAY_API_ORIGIN', 'https://forumpay.com');
 
 add_action('plugins_loaded', 'woocommerce_forumpay_init', 0);
 
@@ -128,7 +130,7 @@ function woocommerce_forumpay_init()
 
             $base_path = WP_PLUGIN_URL . "/" . plugin_basename(dirname(__FILE__));
 
-            $apiurl = 'https://forumpay.com/api/v2/GetCurrencyList/';
+            $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/GetCurrencyList/';
             $cForumPayParam = array();
             $CurrencyList = $this->api_call($apiurl, $cForumPayParam);
             if (!$CurrencyList) {
@@ -185,46 +187,50 @@ function woocommerce_forumpay_init()
 
 <div class="fp-details" style="display: none" id="fp-details-div">
 
-<div class="forumpay-rowsm">
-<div class="forumpay-col1">' . __('Rate') . ':</div>
-<div class="forumpay-col2">
-<snap id="forumpay-exrate"> </snap>
-</div>
-</div>
+    <details>
+        <summary>Details</summary>
 
-<div class="forumpay-rowsm">
-<div class="forumpay-col1">' . __('Exchange amount') . ':</div>
-<div class="forumpay-col2">
-<snap id="forumpay-examt"> </snap>
-</div>
-</div>
+        <div class="forumpay-rowsm">
+            <div class="forumpay-col1">' . __('Rate') . ':</div>
+            <div class="forumpay-col2">
+            <snap id="forumpay-exrate"> </snap>
+            </div>
+        </div>
 
-<div class="forumpay-rowsm">
-<div class="forumpay-col1">' . __('Network processing fee') . ':</div>
-<div class="forumpay-col2">
-<snap id="forumpay-netpfee"> </snap>
-</div>
-</div>
+        <div class="forumpay-rowsm">
+            <div class="forumpay-col1">' . __('Exchange amount') . ':</div>
+            <div class="forumpay-col2">
+            <snap id="forumpay-examt"> </snap>
+            </div>
+        </div>
 
-<div class="forumpay-row">
-<div class="forumpay-col1">' . __('Total') . ':</div>
-<div class="forumpay-col2">
-<snap id="forumpay-tot"> </snap>
-</div>
-</div>
+        <div class="forumpay-rowsm">
+            <div class="forumpay-col1">' . __('Network processing fee') . ':</div>
+            <div class="forumpay-col2">
+            <snap id="forumpay-netpfee"> </snap>
+            </div>
+        </div>
+    </details>
 
-<div class="forumpay-rowsm" id="forumpay-wtime-div">
-<div class="forumpay-col1">' . __('Expected time to wait') . ':</div>
-<div class="forumpay-col2">
-<snap id="forumpay-waittime"> </snap>
-</div>
-</div>
+    <div class="forumpay-row total">
+        <div class="forumpay-col1">' . __('Total') . ':</div>
+        <div class="forumpay-col2">
+        <snap id="forumpay-tot"> </snap>
+        </div>
+    </div>
 
-<div class="forumpay-rowsm" id="forumpay-txfee-div">
-<div class="forumpay-col1">' . __('TX fee set to') . ':</div>
-<div class="forumpay-col2">
-<snap id="forumpay-txfee"> </snap>
-</div>
+    <div class="forumpay-rowsm" id="forumpay-wtime-div">
+        <div class="forumpay-col1">' . __('Expected time to wait') . ':</div>
+        <div class="forumpay-col2">
+        <snap id="forumpay-waittime"> </snap>
+        </div>
+    </div>
+
+    <div class="forumpay-rowsm" id="forumpay-txfee-div">
+        <div class="forumpay-col1">' . __('TX fee set to') . ':</div>
+        <div class="forumpay-col2">
+        <snap id="forumpay-txfee"> </snap>
+    </div>
 </div>
 
 <div class="forumpay-row forumpay-qr" style="display: none" id="qr-img-div">
@@ -311,7 +317,7 @@ Start payment</button>
                     exit;
                 }
 
-                $apiurl = 'https://forumpay.com/api/v2/CheckPayment/';
+                $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/CheckPayment/';
 
                 $ForumPayParam = array(
                     "pos_id" => $ipnrear['pos_id'],
@@ -344,7 +350,7 @@ Start payment</button>
 
             if ($_REQUEST['act'] == 'getrate') {
 
-                $apiurl = 'https://forumpay.com/api/v2/GetRate/';
+                $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/GetRate/';
                 $orderid = $_REQUEST['orderid'];
                 $order = new WC_Order($orderid);
 
@@ -383,7 +389,7 @@ Start payment</button>
 
             if ($_REQUEST['act'] == 'getqr') {
 
-                $apiurl = 'https://forumpay.com/api/v2/StartPayment/';
+                $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/StartPayment/';
                 $orderid = $_REQUEST['orderid'];
                 $order = new WC_Order($orderid);
 
@@ -423,7 +429,7 @@ Start payment</button>
             }
 
             if ($_REQUEST['act'] == 'getst') {
-                $apiurl = 'https://forumpay.com/api/v2/CheckPayment/';
+                $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/CheckPayment/';
 
                 $orderid = $_REQUEST['orderid'];
                 $order = new WC_Order($orderid);
