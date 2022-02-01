@@ -396,6 +396,12 @@ Start payment</button>
                 $currency_code = $this->currency;
 
                 $total = $order->get_total();
+                $payer_ip_address = trim($order->get_customer_ip_address());
+                $payer_user_agent = $order->get_customer_user_agent();
+                 
+                if (filter_var($payer_ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                    $payer_ip_address = null;
+                }
 
                 $ForumPayParam = array(
                     "pos_id" => $this->pos_id,
@@ -403,6 +409,8 @@ Start payment</button>
                     "invoice_amount" => $total,
                     "currency" => $_REQUEST['currency'],
                     "reference_no" => $orderid,
+                    "payer_ip_address" => $payer_ip_address,
+                    "payer_user_agent" => $payer_user_agent,
                 );
 
                 $payres = $this->api_call($apiurl, $ForumPayParam);
