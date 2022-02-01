@@ -37,7 +37,7 @@ Navigate to **WooCommerce > Settings > Payments**, find the Forumpay module and 
 4. **API User**  
    Unique ForumPay API-key identifier that you have to generate in the Forumpay dashboard.
    It can be found in your **Profile** section.  
-   [Go to profile >](https://forumpay.com/account)
+   [Go to profile >](https://dashboard.forumpay.com/pay/userPaymentGateway.api_settings)
 5. **API Secret**  
    *Important:* never share it to anyone!
    Think of it as a password.
@@ -56,7 +56,7 @@ If you do not set the webhook notifications, orders may stay in the *Pending* st
 
 ### Webhook setup:
 
-Webhook configuration is in your [Profile](https://forumpay.com/account). You can find the webhook URL by scrolling down.
+Webhook configuration is in your [Profile](https://dashboard.forumpay.com/pay/userPaymentGateway.api_settings#webhook_notifications). You can find the webhook URL by scrolling down.
 
 Insert **URL** in the webhook URL field:
 `YOUR_WEBSHOP/index.php?wc-api=wc_forumpay&act=webhook`

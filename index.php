@@ -3,11 +3,10 @@
  * Plugin Name: WooCommerce Forumpay Payment Gateway Plugin
  * Plugin URI: https://forumpay.com
  * Description: Extends WooCommerce with Forumpay gateway.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Limitlex
  **/
 
-define('FORUMPAY_API_ORIGIN', 'https://forumpay.com');
 
 add_action('plugins_loaded', 'woocommerce_forumpay_init', 0);
 
@@ -30,7 +29,7 @@ function woocommerce_forumpay_init()
             $this->id = 'forumpay';
             $this->method_title = __('Forumpay', 'forumpay');
             $this->method_description = "Pay with Crypto (by ForumPay)";
-            $this->icon = WP_PLUGIN_URL . "/" . plugin_basename(dirname(__FILE__)) . '/images/forumpay-logo.png';
+            $this->icon = WP_PLUGIN_URL . "/" . plugin_basename(dirname(__FILE__)) . '/images/logo-forumpay-1.svg';
 
             $this->has_fields = false;
             $this->init_form_fields();
@@ -38,6 +37,7 @@ function woocommerce_forumpay_init()
             $this->title = $this->settings['title'];
             $this->description = $this->settings['description'];
             $this->pos_id = $this->settings['pos_id'];
+            $this->api_url = $this->settings['api_url'] ?? 'https://api.forumpay.com/pay/v2';
             $this->api_user = $this->settings['api_user'];
             $this->api_key = $this->settings['api_key'];
             $this->currency = get_woocommerce_currency();
@@ -77,8 +77,16 @@ function woocommerce_forumpay_init()
                 'pos_id' => array(
                     'title' => __('POS ID', 'forumpay'),
                     'type' => 'text',
-                    'description' => __('Enter POS ID Given by Forumpay')),
-
+                    'description' => __('Enter your webshop identifier (POS ID)')),
+                'api_url' => array(
+                    'title' => __('Production/Sandbox', 'forumpay'),
+                    'type' => 'select',
+                    'default' => 'Production',
+                    'options' => array(
+                        'https://api.forumpay.com/pay/v2' => 'Production',
+                        'https://sandbox.forumpay.com/api/v2' => 'Sandbox',
+                    ),
+                ),
                 'api_user' => array(
                     'title' => __('API User', 'forumpay'),
                     'type' => 'text',
@@ -130,9 +138,8 @@ function woocommerce_forumpay_init()
 
             $base_path = WP_PLUGIN_URL . "/" . plugin_basename(dirname(__FILE__));
 
-            $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/GetCurrencyList/';
             $cForumPayParam = array();
-            $CurrencyList = $this->api_call($apiurl, $cForumPayParam);
+            $CurrencyList = $this->api_call('/GetCurrencyList/', $cForumPayParam);
             if (!$CurrencyList) {
                 echo "<p>Could not perform API Call, please check Forumpay plugin settings.</p>";
                 return false;
@@ -156,7 +163,7 @@ function woocommerce_forumpay_init()
             $extahtm .= "<link rel='stylesheet'  href='" . $base_path . "/css/forumpay.css' />";
             $extahtm .= '<script type="text/javascript" src="' . $base_path . '/js/forumpay.js"></script>';
 
-            $logoimg = WP_PLUGIN_URL . "/" . plugin_basename(dirname(__FILE__)) . '/images/forumpay-logo.png';
+            $logoimg = WP_PLUGIN_URL . "/" . plugin_basename(dirname(__FILE__)) . '/images/logo-forumpay-1.svg';
             $loadimg = WP_PLUGIN_URL . "/" . plugin_basename(dirname(__FILE__)) . '/images/page-load.gif';
 
             $sCurrencyList = '';
@@ -266,8 +273,9 @@ Start payment</button>
 
         }
 
-        public function api_call($rest_url, $ForumPay_Params)
+        public function api_call($ForumPay_Method, $ForumPay_Params)
         {
+            $rest_url = $this->api_url . $ForumPay_Method;
             $ForumPay_Qr = http_build_query($ForumPay_Params);
 
             $curl = curl_init(trim($rest_url));
@@ -317,8 +325,6 @@ Start payment</button>
                     exit;
                 }
 
-                $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/CheckPayment/';
-
                 $ForumPayParam = array(
                     "pos_id" => $ipnrear['pos_id'],
                     "payment_id" => $ipnrear['payment_id'],
@@ -326,7 +332,7 @@ Start payment</button>
                     "currency" => $ipnrear['currency'],
                 );
 
-                $payres = $this->api_call($apiurl, $ForumPayParam);
+                $payres = $this->api_call('/CheckPayment/', $ForumPayParam);
 
                 if (($payres['status'] == 'Confirmed') || ($payres['status'] == 'Cancelled')) {
                     $orderid = $payres['reference_no'];
@@ -350,7 +356,6 @@ Start payment</button>
 
             if ($_REQUEST['act'] == 'getrate') {
 
-                $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/GetRate/';
                 $orderid = $_REQUEST['orderid'];
                 $order = new WC_Order($orderid);
 
@@ -366,7 +371,7 @@ Start payment</button>
                     "reference_no" => $orderid,
                 );
 
-                $payres = $this->api_call($apiurl, $ForumPayParam);
+                $payres = $this->api_call('/GetRate/', $ForumPayParam);
 
                 if ($payres['err']) {
                     $data['errmgs'] = $payres['err'];
@@ -389,7 +394,6 @@ Start payment</button>
 
             if ($_REQUEST['act'] == 'getqr') {
 
-                $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/StartPayment/';
                 $orderid = $_REQUEST['orderid'];
                 $order = new WC_Order($orderid);
 
@@ -413,7 +417,7 @@ Start payment</button>
                     "payer_user_agent" => $payer_user_agent,
                 );
 
-                $payres = $this->api_call($apiurl, $ForumPayParam);
+                $payres = $this->api_call('/StartPayment/', $ForumPayParam);
 
                 if ($payres['err']) {
                     $data['errmgs'] = $payres['err'];
@@ -437,7 +441,6 @@ Start payment</button>
             }
 
             if ($_REQUEST['act'] == 'getst') {
-                $apiurl = FORUMPAY_API_ORIGIN . '/api/v2/CheckPayment/';
 
                 $orderid = $_REQUEST['orderid'];
                 $order = new WC_Order($orderid);
@@ -452,7 +455,7 @@ Start payment</button>
                     "currency" => $_REQUEST['currency'],
                 );
 
-                $payres = $this->api_call($apiurl, $ForumPayParam);
+                $payres = $this->api_call('/CheckPayment/', $ForumPayParam);
 
                 $data['status'] = $payres['status'];
 
