@@ -40,6 +40,7 @@ function woocommerce_forumpay_init()
             $this->api_url = $this->settings['api_url'] ?? 'https://api.forumpay.com/pay/v2';
             $this->api_user = $this->settings['api_user'];
             $this->api_key = $this->settings['api_key'];
+            $this->accept_zero_confirmations = $this->settings['accept_zero_confirmations'] == 'yes' ? true : false;
             $this->currency = get_woocommerce_currency();
 
             add_action('valid-forumpay-request', array(&$this, 'successful_request'));
@@ -98,6 +99,12 @@ function woocommerce_forumpay_init()
                     'title' => __('POS ID', 'forumpay'),
                     'type' => 'text',
                     'description' => __('Enter your webshop identifier (POS ID)')),
+
+                'accept_zero_confirmations' => array(
+                    'title' => __('Accept Zero Confirmations', 'forumpay'),
+                    'type' => 'checkbox',
+                    'label' => __('Enable Accept Zero Confirmations.', 'forumpay'),
+                    'default' => 'no'),
             );
 
         }
@@ -360,10 +367,9 @@ Start payment</button>
 
                 $orderid = $_REQUEST['orderid'];
                 $order = new WC_Order($orderid);
-
                 $currency_code = $this->currency;
-
                 $total = $order->get_total();
+                $azc = $this->accept_zero_confirmations ? 'true' : 'false';
 
                 $ForumPayParam = array(
                     "pos_id" => $this->pos_id,
@@ -371,6 +377,7 @@ Start payment</button>
                     "invoice_amount" => $total,
                     "currency" => $_REQUEST['currency'],
                     "reference_no" => $orderid,
+                    "accept_zero_confirmations" => $azc,
                 );
 
                 $payres = $this->api_call('/GetRate/', $ForumPayParam);
@@ -404,6 +411,8 @@ Start payment</button>
                 $total = $order->get_total();
                 $payer_ip_address = trim($order->get_customer_ip_address());
                 $payer_user_agent = $order->get_customer_user_agent();
+
+                $azc = $this->accept_zero_confirmations ? 'true' : 'false';
                  
                 if (filter_var($payer_ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
                     $payer_ip_address = null;
@@ -417,6 +426,7 @@ Start payment</button>
                     "reference_no" => $orderid,
                     "payer_ip_address" => $payer_ip_address,
                     "payer_user_agent" => $payer_user_agent,
+                    "accept_zero_confirmations" => $azc,
                 );
 
                 $payres = $this->api_call('/StartPayment/', $ForumPayParam);
