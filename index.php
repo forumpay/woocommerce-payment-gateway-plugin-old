@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: WooCommerce Forumpay Payment Gateway Plugin
+ * Plugin Name: WooCommerce ForumPay Payment Gateway Plugin
  * Plugin URI: https://forumpay.com
- * Description: Extends WooCommerce with Forumpay gateway.
+ * Description: Extends WooCommerce with ForumPay gateway.
  * Version: 1.2.0
  * Author: Limitlex
  **/
@@ -62,7 +62,7 @@ function woocommerce_forumpay_init()
                 'enabled' => array(
                     'title' => __('Enable/Disable', 'forumpay'),
                     'type' => 'checkbox',
-                    'label' => __('Enable Forumpay Payment Module.', 'forumpay'),
+                    'label' => __('Enable ForumPay Payment Module.', 'forumpay'),
                     'default' => 'no'),
                 'title' => array(
                     'title' => __('Title:', 'forumpay'),
@@ -74,12 +74,9 @@ function woocommerce_forumpay_init()
                     'type' => 'textarea',
                     'description' => __('This controls the description which the user sees during checkout.', 'forumpay'),
                     'default' => __('Pay with Crypto (by ForumPay)', 'forumpay')),
-                'pos_id' => array(
-                    'title' => __('POS ID', 'forumpay'),
-                    'type' => 'text',
-                    'description' => __('Enter your webshop identifier (POS ID)')),
                 'api_url' => array(
-                    'title' => __('Production/Sandbox', 'forumpay'),
+                    'title' => __('Environment', 'forumpay'),
+                    'description' => __('ForumPay environment'),
                     'type' => 'select',
                     'default' => 'Production',
                     'options' => array(
@@ -90,12 +87,17 @@ function woocommerce_forumpay_init()
                 'api_user' => array(
                     'title' => __('API User', 'forumpay'),
                     'type' => 'text',
-                    'description' => __('Enter API User Given by Forumpay')),
+                    'description' => __('Enter API User Given by ForumPay')),
 
                 'api_key' => array(
                     'title' => __('API Secret', 'forumpay'),
                     'type' => 'text',
-                    'description' => __('Enter API Secret Given by Forumpay')),
+                    'description' => __('Enter API Secret Given by ForumPay')),
+                    
+                'pos_id' => array(
+                    'title' => __('POS ID', 'forumpay'),
+                    'type' => 'text',
+                    'description' => __('Enter your webshop identifier (POS ID)')),
             );
 
         }
@@ -106,7 +108,7 @@ function woocommerce_forumpay_init()
          **/
         public function admin_options()
         {
-            echo '<h3>' . __('Forumpay Payment Gateway', 'forumpay') . '</h3>';
+            echo '<h3>' . __('ForumPay Payment Gateway', 'forumpay') . '</h3>';
             echo '<p>' . __('Pay with Crypto (by ForumPay)') . '</p>';
             echo '<table class="form-table">';
             $this->generate_settings_html();
@@ -141,7 +143,7 @@ function woocommerce_forumpay_init()
             $cForumPayParam = array();
             $CurrencyList = $this->api_call('/GetCurrencyList/', $cForumPayParam);
             if (!$CurrencyList) {
-                echo "<p>Could not perform API Call, please check Forumpay plugin settings.</p>";
+                echo "<p>Could not perform API Call, please check ForumPay plugin settings.</p>";
                 return false;
             }
 
