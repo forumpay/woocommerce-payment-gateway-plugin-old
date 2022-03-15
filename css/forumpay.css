@@ -1,16 +1,30 @@
 .forumpay-main {
   display: flex;
   flex-direction: column;
-  width: 520px;
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
-  background-color: #ddffdd;
+  width: 350px;
+  box-shadow: 0 5px 15px hsl(0deg 0% 0% / 10%);
+  border-radius: 15px;
+  background-color: #FFFFFF;
   font-family: monospace;
+  color: #0e1726;
+  padding: 20px;
+  gap: 20px;
+  font-size: 20px;
+  margin-bottom: 50px;
 }
 
 .forumpay-title {
-  padding: 15px 0;
   justify-content: center;
 }
+
+.forumpay-title select {
+  width: 100%;
+  background-color: #F8F8F8;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
 .forumpay-addr {
   justify-content: center;
 }
@@ -37,27 +51,30 @@
   border: none;
   font-size: 15px;
   padding: 0 15px;
-  margin-top: 10px;
 }
+
 .fp-details details summary {
   background: none;
   color: inherit;
   text-shadow: none;
 }
 
-.forumpay-row-pay {
-  margin: 10px;
+.paybtn {
+  width: 100%;
+  border-radius: 5px;
+  background-color: #fbbb0e;
+  color: #0e1726;
+  padding: 10px;
 }
 
-.paybtn {
-  margin: 10px;
+.paybtn:hover {
+  text-decoration: none;
 }
 
 .forumpay-row {
   width: 100%;
   text-align: center;
   line-height: 20px;
-  font-size: 20px;
   margin: 0;
   display: flex;
 }
@@ -66,7 +83,8 @@
 }
 
 .forumpay-row > img {
-  margin: 20px 80px;
+  width: 150px;
+  padding-bottom: 20px;
   display: block;
 }
 
@@ -77,30 +95,34 @@
   margin: 0px;
   font-size: 15px;
   display: flex;
+  padding-top: 5px;
 }
 .forumpay-col1 {
   text-align: left;
-  margin-left: 20px;
 }
 
 .forumpay-col2 {
-  margin-right: 10px;
   text-align: right;
   flex-grow: 1;
 }
 
 .forumpay-err {
-  background-color: #ffdddd;
+  background-color: rgba(255,154,154,0.398);
+  border-radius: 5px;
+  padding: 10px;
   margin: 0px;
-  padding-top: 15px;
-  line-height: 30px;
 }
 
 .forumpay-st {
-  background-color: #8ef98e;
+  background-color: #d7f8e6;
+  border-radius: 5px;
+  padding: 10px;
   margin: 0px;
-  padding: 8px 0;
-  line-height: 30px;
+}
+
+.forumpay-err snap,
+.forumpay-st snap {
+  font-size: 15px;
 }
 
 #forumpay-loading {

@@ -187,17 +187,20 @@ function woocommerce_forumpay_init()
 	<div class="forumpay-row forumpay-row-img">
  <img src="' . $logoimg . '"  alt="Pay with Crypto (by ForumPay)" />
 </div>
-	<div class="forumpay-row">
-<div class="forumpay-col1">Order No</div>
-<div class="forumpay-col2">' . $order_id . '</div>
+<div>
+    <div class="forumpay-row">
+        <div class="forumpay-col1">Order No</div>
+        <div class="forumpay-col2">' . $order_id . '</div>
+    </div>
+    <div class="forumpay-row">
+        <div class="forumpay-col1">' . __('Order amount') . '</div>
+        <div class="forumpay-col2">' . $amount . ' ' . $this->currency . '</div>
+    </div>
 </div>
-<div class="forumpay-row">
-<div class="forumpay-col1">' . __('Order amount') . '</div>
-<div class="forumpay-col2">' . $amount . ' ' . $this->currency . '</div>
-</div>
-		<div class="forumpay-row forumpay-title" id="forumpay-ccy-div">
+
+<div class="forumpay-row forumpay-title" id="forumpay-ccy-div">
     <select name="ChangeCurrency" onChange="forumpaygetrate(this.value)">
-		<option value="0">--' . __('Select Cryptocurrency') . '--</option>' . $sCurrencyList . '
+    <option value="0">' . __('Select Cryptocurrency') . '</option>' . $sCurrencyList . '
     </select>
 </div>
 
@@ -256,20 +259,21 @@ function woocommerce_forumpay_init()
   <snap id="forumpay-addr"></snap>
 </div>
 
-<div class="forumpay-row forumpay-row-pay" id="forumpay-btn-div">
-  <button type="submit" id="forumpay-payment-btn" class="paybtn" style="width:90%;" onclick="forumpaygetqrcode()">
-Start payment</button>
+<div class="forumpay-row" id="forumpay-btn-div">
+    <button type="submit" id="forumpay-payment-btn" class="paybtn" onclick="forumpaygetqrcode()">
+        Start payment
+    </button>
 </div>
 
 </div>
 
-<div class="forumpay-row forumpay-st" id="forumpay-payst-div" style="display: none">
-  ' . __('Status') . ' :
+<div class="forumpay-st" id="forumpay-payst-div" style="display: none">
+  <p>' . __('Status') . ':</p>
   <snap id="forumpay-payst"> </snap>
 </div>
 
-<div class="forumpay-row forumpay-err" id="forumpay-err-div" style="display: none">
-  ' . __('Error') . ' :
+<div class="forumpay-err" id="forumpay-err-div" style="display: none">
+  <p>' . __('Error') . ':</p>
   <snap id="forumpay-err"> </snap>
 </div>
 
