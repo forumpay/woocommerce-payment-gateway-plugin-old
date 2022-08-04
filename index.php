@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce ForumPay Payment Gateway Plugin
  * Plugin URI: https://forumpay.com
  * Description: Extends WooCommerce with ForumPay gateway.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: Limitlex
  **/
 
@@ -178,9 +178,7 @@ function woocommerce_forumpay_init()
             $sCurrencyList = '';
 
             foreach ($CurrencyList as $Currency) {
-                if ($Currency['currency'] != 'USDT') {
-                    $sCurrencyList .= '<option value=' . $Currency['currency'] . '>' . $Currency['description'] . ' (' . $Currency['currency'] . ')</option>';
-                }
+                $sCurrencyList .= '<option value=' . $Currency['currency'] . '>' . $Currency['description'] . ' (' . $Currency['currency'] . ')</option>';
 
             }
             $templatehtml = '<div class="forumpay-main">
