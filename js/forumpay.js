@@ -13,6 +13,12 @@ script.src = "https://code.jquery.com/jquery-3.4.1.min.js";
 script.type = "text/javascript";
 document.getElementsByTagName("head")[0].appendChild(script);
 
+function forumpaychangecurrency(currency) {
+  clearInterval(fpTimer);
+  timeerstar = "";
+  forumpaygetrate(currency);
+}
+
 function forumpaygetrate(currency) {
   if (currency == "0") {
     clearInterval(fpTimer);
@@ -51,6 +57,12 @@ function forumpaygetrate(currency) {
         $("#forumpay-waittime").text(response_json.waittime);
         $("#forumpay-txfee").text(response_json.txfee);
         $("#fp-details-div").show();
+
+        if (response_json.fast_transaction_fee === '0.00000000') {
+          $("#forumpay-txfee-div").hide();
+        } else {
+          $("#forumpay-txfee-div").show();
+        }
 
         fpcurrency = currency;
         fpaddr = response_json.addr;

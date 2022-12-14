@@ -62,7 +62,7 @@ Insert **URL** in the webhook URL field:
 `YOUR_WEBSHOP/index.php?wc-api=wc_forumpay&act=webhook`
 
 **YOUR_WEBSHOP** is the URL of your webshop. An example:  
-`https://my.webshop.com/index.php?wc-api=wc_forumpay&act=webhookk`
+`https://my.webshop.com/index.php?wc-api=wc_forumpay&act=webhook`
 
 ## Functionality
 

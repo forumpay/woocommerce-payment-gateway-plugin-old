@@ -197,7 +197,7 @@ function woocommerce_forumpay_init()
 </div>
 
 <div class="forumpay-row forumpay-title" id="forumpay-ccy-div">
-    <select name="ChangeCurrency" onChange="forumpaygetrate(this.value)">
+    <select name="ChangeCurrency" onChange="forumpaychangecurrency(this.value)">
     <option value="0">' . __('Select Cryptocurrency') . '</option>' . $sCurrencyList . '
     </select>
 </div>
@@ -396,6 +396,8 @@ function woocommerce_forumpay_init()
                     $data['amount'] = $payres['amount'] . ' ' . $payres['currency'];
                     $data['payment_id'] = $payres['payment_id'];
                     $data['txfee'] = $payres['fast_transaction_fee'] . ' ' . $payres['fast_transaction_fee_currency'];
+                    $data['fast_transaction_fee'] = $payres['fast_transaction_fee'];
+                    $data['fast_transaction_fee_currency'] = $payres['fast_transaction_fee_currency'];
                     $data['waittime'] = $payres['wait_time'];
                 }
 
@@ -413,7 +415,7 @@ function woocommerce_forumpay_init()
                 $total = $order->get_total();
                 $payer_ip_address = trim($order->get_customer_ip_address());
                 $payer_user_agent = $order->get_customer_user_agent();
-
+                $payer_email = $order->get_billing_email();
                 $azc = $this->accept_zero_confirmations ? 'true' : 'false';
                  
                 if (filter_var($payer_ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
@@ -428,6 +430,7 @@ function woocommerce_forumpay_init()
                     "reference_no" => $orderid,
                     "payer_ip_address" => $payer_ip_address,
                     "payer_user_agent" => $payer_user_agent,
+                    "payer_email" => $payer_email,
                     "accept_zero_confirmations" => $azc,
                 );
 
