@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce ForumPay Payment Gateway Plugin
  * Plugin URI: https://forumpay.com
  * Description: Extends WooCommerce with ForumPay gateway.
- * Version: 1.3.1
+ * Version: 1.3.2
  * Author: Limitlex
  **/
 
