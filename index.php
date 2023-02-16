@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce ForumPay Payment Gateway Plugin
  * Plugin URI: https://forumpay.com
  * Description: Extends WooCommerce with ForumPay gateway.
- * Version: 1.3.2
+ * Version: 1.3.3
  * Author: Limitlex
  **/
 
@@ -94,7 +94,7 @@ function woocommerce_forumpay_init()
                     'title' => __('API Secret', 'forumpay'),
                     'type' => 'text',
                     'description' => __('Enter API Secret Given by ForumPay')),
-                    
+
                 'pos_id' => array(
                     'title' => __('POS ID', 'forumpay'),
                     'type' => 'text',
@@ -284,6 +284,40 @@ function woocommerce_forumpay_init()
 
         }
 
+        public function api_get_all_payments($orderid) {
+            if (!$orderid) {
+                throw new Exception('Could not get payments, orderid field is mandatory.');
+            }
+
+            $ForumPayParam = array(
+                "pos_id" => $this->pos_id,
+                "reference_no" => $orderid
+            );
+
+            $payres = $this->api_call('/GetTransactions/', $ForumPayParam);
+
+            if (array_key_exists('invoices', $payres)) {
+                return $payres['invoices'];
+            }
+
+            return [];
+        }
+
+        public function api_cancel_payment($payment_id, $currency, $address) {
+            $ForumPayParam = array(
+                "pos_id" => $this->pos_id,
+                "payment_id" => $payment_id,
+                "currency" => $currency,
+                "address" => $address,
+                "reason" => 'other',
+                "comment" => 'New payment created, canceling all other'
+            );
+
+            $payres = $this->api_call('/CancelPayment/', $ForumPayParam);
+
+            return $payres;
+        }
+
         public function api_call($ForumPay_Method, $ForumPay_Params)
         {
             $rest_url = $this->api_url . $ForumPay_Method;
@@ -354,7 +388,10 @@ function woocommerce_forumpay_init()
                         $order->add_order_note('ForumPay Payment Successful');
                         $woocommerce->cart->empty_cart();
                     } else if ($payres['status'] == 'Cancelled') {
-                        $order->update_status('failed', 'Failed, Payment Status : ' . $payres['status']);
+
+                        //check if this is the only payment
+
+                        $this->cancelWooCommerceOrder($orderid, $order);
                     }
 
                     echo "OK";
@@ -417,7 +454,7 @@ function woocommerce_forumpay_init()
                 $payer_user_agent = $order->get_customer_user_agent();
                 $payer_email = $order->get_billing_email();
                 $azc = $this->accept_zero_confirmations ? 'true' : 'false';
-                 
+
                 if (filter_var($payer_ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
                     $payer_ip_address = null;
                 }
@@ -453,6 +490,25 @@ function woocommerce_forumpay_init()
                     $data['txfee'] = $payres['fast_transaction_fee'] . ' ' . $payres['fast_transaction_fee_currency'];
                     $data['waittime'] = $payres['wait_time'];
                 }
+
+
+
+                if ($data['status'] === 'Yes') {
+                    //cancel all other existing payments
+                    $existingPayments = $this->api_get_all_payments($orderid);
+                    foreach ($existingPayments as $existingPayment) {
+                        if (
+                            $existingPayment['payment_id'] === $data['payment_id']
+                            || $existingPayment['status'] !== 'Waiting'
+                        ) {
+                            //newly created
+                            continue;
+                        }
+
+                        $response = $this->api_cancel_payment($existingPayment['payment_id'], $existingPayment['currency'], $existingPayment['address']);
+                    }
+                }
+
                 echo json_encode($data, true);
                 exit;
             }
@@ -485,13 +541,30 @@ function woocommerce_forumpay_init()
                     }
 
                     if ($payres['status'] == 'Cancelled') {
-                        $order->update_status('failed', 'Failed, Payment Status : ' . $payres['status']);
+                        $this->cancelWooCommerceOrder($orderid, $order, $payres['status']);
                     }
                 }
 
                 echo json_encode($data, true);
             }
             exit;
+        }
+
+        public function cancelWooCommerceOrder($orderid, WC_Order $order)
+        {
+            $existingPayments = $this->api_get_all_payments($orderid);
+
+            $allPaymentsCancelled = true;
+            foreach ($existingPayments as $existingPayment) {
+                if ($existingPayment['status'] !== 'Cancelled') {
+                    $allPaymentsCancelled = false;
+                    break;
+                }
+            }
+
+            if ($allPaymentsCancelled) {
+                $order->update_status('failed', 'Failed, Payment Status : Cancelled');
+            }
         }
     }
 

@@ -170,9 +170,6 @@ function forumpaygetstaus() {
       if (response_json.status == "Confirmed") {
         var returl = (getsturl = $("#forumpay-returl").attr("data"));
         window.location.href = returl;
-      } else if (response_json.status == "Cancelled") {
-        var cancelurl = $("#forumpay-cancelurl").attr("data");
-        window.location.href = cancelurl;
       } else {
         $("#forumpay-payst").text(response_json.status);
         $("#forumpay-payst-div").show();
